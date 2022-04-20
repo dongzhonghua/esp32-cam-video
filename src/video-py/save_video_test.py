@@ -22,20 +22,8 @@ def read_from_mjpg_stream():
 
 
 if __name__ == "__main__":
-    refresh_video_job()
-    cur_hour = datetime.datetime.now().hour
-    file_path = root_path + str(datetime.date.today()) + "/" + str(cur_hour) + ".mp4"
-    print("初始化文件: " + file_path)
-    out = cv2.VideoWriter(file_path, cv2.VideoWriter_fourcc(*"mp4v"), 12, (1280, 720))  # 写入视频
+    out = cv2.VideoWriter("video.mp4", cv2.VideoWriter_fourcc(*"mp4v"), 12, (1280, 720))  # 写入视频
     for frame in read_from_mjpg_stream():
-        now = datetime.datetime.now()
-        temp_hour = now.hour
-        if now.minute == 0 and cur_hour != temp_hour:  # 每小时换一个文件存储视频
-            file_path = root_path + str(datetime.date.today()) + "/" + str(temp_hour) + ".mp4"
-            cur_hour = temp_hour
-            print("更换文件: " + file_path)
-            out.release()
-            out = cv2.VideoWriter(file_path, cv2.VideoWriter_fourcc(*"mp4v"), 24, (1960, 1080))  # 写入视频
         out.write(frame)  # 写入帧
         cv2.imshow("video stream", frame)
         if cv2.waitKey(1) == 27:
