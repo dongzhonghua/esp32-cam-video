@@ -344,7 +344,7 @@ void streamCB(void *pvParameters) {
 
 const char JHEADER[] = "HTTP/1.1 200 OK\r\n" \
                        "Content-disposition: inline; filename=capture.jpg\r\n" \
-                       "Content-type: image/jpeg\r\n\r\n";
+                       "Content-type: image/jpeg\r\n\r\n"; // Content-disposition 默认inline，filename表示下载内容时的推荐命名。attachment的话就是自动下载
 const int jhdLen = strlen(JHEADER);
 
 // ==== Serve up one JPEG frame =============================================
