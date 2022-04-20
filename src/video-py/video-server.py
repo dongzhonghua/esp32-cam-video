@@ -32,8 +32,6 @@ def index():
 def gen(camera):
     while True:
         frame = camera.get_frame()
-        frame_count = camera.video.get(cv2.CAP_PROP_FRAME_COUNT)
-        print(frame_count)
         # 使用generator函数输出视频流， 每次请求输出的content类型是image/jpeg
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')

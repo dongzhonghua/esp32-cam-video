@@ -1,4 +1,5 @@
 import datetime
+import time
 from urllib import request
 
 import cv2
@@ -8,10 +9,26 @@ from refresh_video_dir import refresh_video_job, root_path
 
 
 def read_from_mjpg_stream():
-    stream = request.urlopen("http://localhost:8889/video")
+    url = "http://localhost:8889/video"
+    stream = request.urlopen(url)
     bytes = b""
+    max_retry = 0
     while True:
-        bytes += stream.read(1024)
+        tmp = stream.read(1024)
+        print(len(tmp))
+        if len(tmp) <= 1:  # 如果服务端重启，则等待一段时间重新连接
+            max_retry = max_retry + 1
+            print(max_retry)
+            if max_retry > 100:
+                time.sleep(1)
+                try:
+                    stream = request.urlopen(url)
+                except Exception:
+                    print("服务端异常，连接不到服务器")
+                    pass
+                print("重新连接服务器")
+                max_retry = 0
+        bytes += tmp
         a = bytes.find(b"\xff\xd8")  # jpeg格式的图片以这两个字节开头以下面两个字节结尾
         b = bytes.find(b"\xff\xd9")
         if a != -1 and b != -1:
@@ -26,7 +43,7 @@ if __name__ == "__main__":
     cur_hour = datetime.datetime.now().hour
     file_path = root_path + str(datetime.date.today()) + "/" + str(cur_hour) + ".mp4"
     print("初始化文件: " + file_path)
-    out = cv2.VideoWriter(file_path, cv2.VideoWriter_fourcc(*"mp4v"), 12, (1280, 720))  # 写入视频
+    out = cv2.VideoWriter(file_path, cv2.VideoWriter_fourcc(*"mp4v"), 24, (1280, 720))  # 写入视频
     for frame in read_from_mjpg_stream():
         now = datetime.datetime.now()
         temp_hour = now.hour
@@ -35,7 +52,7 @@ if __name__ == "__main__":
             cur_hour = temp_hour
             print("更换文件: " + file_path)
             out.release()
-            out = cv2.VideoWriter(file_path, cv2.VideoWriter_fourcc(*"mp4v"), 24, (1960, 1080))  # 写入视频
+            out = cv2.VideoWriter(file_path, cv2.VideoWriter_fourcc(*"mp4v"), 24, (1280, 720))  # 写入视频
         out.write(frame)  # 写入帧
         cv2.imshow("video stream", frame)
         if cv2.waitKey(1) == 27:
