@@ -34,6 +34,9 @@
 #include <esp_wifi.h>
 #include <esp_sleep.h>
 #include <driver/rtc_io.h>
+#include <SD.h>
+#include "string"
+#include "iostream"
 
 // Select camera model
 //#define CAMERA_MODEL_WROVER_KIT
@@ -45,6 +48,8 @@
 #define MAX_CLIENTS   5
 
 #include "camera_pins.h"
+#include "two_wheels.h"
+#include "ESPAsyncWebServer.h"
 
 void camCB(void *pvParameters);
 
@@ -57,6 +62,14 @@ void streamCB(void *pvParameters);
 void handleJPG(void);
 
 void handleNotFound();
+
+void handleAxis();
+
+void handleArg1();
+
+void handleArg2();
+
+void handleFavicon();
 
 //OV2640 cam;
 
@@ -103,7 +116,12 @@ void mjpegCB(void *pvParameters) {
     //  Registering webserver handling routines
     server.on("/mjpeg/1", HTTP_GET, handleJPGSstream);
     server.on("/jpg", HTTP_GET, handleJPG);
+    server.on("/favicon.ico", HTTP_GET, handleFavicon);
     server.onNotFound(handleNotFound);
+
+    server.on("/axis", HTTP_GET, handleAxis);
+    server.on("/{}", handleArg1);
+    server.on("/p/{}/d/{}", handleArg2);
 
     //  Starting webserver
     server.begin();
@@ -165,7 +183,7 @@ void camCB(void *pvParameters) {
         memcpy(fbs[ifb], b, s);
         esp_camera_fb_return(fb);
 
-        //  Let other tasks run and wait until the end of the current frame rate interval (if any time left)
+        //  Let other tasks run and wait until the end of the current frame rate interval (if any time left_wheel)
         taskYIELD();
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
 
@@ -372,6 +390,39 @@ void handleNotFound() {
     server.send(200, "text / plain", message);
 }
 
+two_wheels device;
+
+void handleAxis() {
+    int args = server.args();
+    printf("server args num: %d \n", args);
+    if (server.hasArg("x") && server.hasArg("y")) {
+        float x = server.arg("x").toFloat();
+        float y = server.arg("y").toFloat();
+        printf("receive axis: %f, %f \n", x, y);
+        device.set_axis(x, y);
+        server.send(200, "text / plain", "set success");
+    } else {
+        server.send(200, "text / plain", "success");
+    }
+}
+
+void handleFavicon() //回調函數
+{
+    server.send(200, "text/plain", "");
+}
+
+void handleArg1() //回調函數
+{
+    String arg = server.pathArg(0);
+    server.send(200, "text/plain", "這是鏈接/{}，參數是： " + arg);
+}
+
+void handleArg2() //回調函數
+{
+    String arg0 = server.pathArg(0);
+    String arg1 = server.pathArg(1);
+    server.send(200, "text/plain", "這是鏈接/p/{}/d/{}，參數是： " + arg0 + " 、 " + arg1);
+}
 
 // ==== SETUP method ==================================================================
 void setup() {
@@ -381,36 +432,52 @@ void setup() {
     delay(1000); // wait for a second to let Serial connect
     Serial.printf("setup: free heap  : %d\n", ESP.getFreeHeap());
 
-    // Configure the camera
-    //  camera_config_t config;
-    //  config.ledc_channel = LEDC_CHANNEL_0;
-    //  config.ledc_timer = LEDC_TIMER_0;
-    //  config.pin_d0 = Y2_GPIO_NUM;
-    //  config.pin_d1 = Y3_GPIO_NUM;
-    //  config.pin_d2 = Y4_GPIO_NUM;
-    //  config.pin_d3 = Y5_GPIO_NUM;
-    //  config.pin_d4 = Y6_GPIO_NUM;
-    //  config.pin_d5 = Y7_GPIO_NUM;
-    //  config.pin_d6 = Y8_GPIO_NUM;
-    //  config.pin_d7 = Y9_GPIO_NUM;
-    //  config.pin_xclk = XCLK_GPIO_NUM;
-    //  config.pin_pclk = PCLK_GPIO_NUM;
-    //  config.pin_vsync = VSYNC_GPIO_NUM;
-    //  config.pin_href = HREF_GPIO_NUM;
-    //  config.pin_sscb_sda = SIOD_GPIO_NUM;
-    //  config.pin_sscb_scl = SIOC_GPIO_NUM;
-    //  config.pin_pwdn = PWDN_GPIO_NUM;
-    //  config.pin_reset = RESET_GPIO_NUM;
-    //  config.xclk_freq_hz = 20000000;
-    //  config.pixel_format = PIXFORMAT_JPEG;
-    //
-    //  // Frame parameters: pick one
-    //  //  config.frame_size = FRAMESIZE_UXGA;
-    //  //  config.frame_size = FRAMESIZE_SVGA;
-    //  //  config.frame_size = FRAMESIZE_QVGA;
-    //  config.frame_size = FRAMESIZE_VGA;
-    //  config.jpeg_quality = 12;
-    //  config.fb_count = 2;
+
+
+//    pinMode(2, OUTPUT);
+//    digitalWrite(2, LOW);
+//    ledcWrite(3, 1024);
+
+
+
+//    device.set_axis(1, 0);
+//    delay(3000);
+//
+//    device.set_axis(0, -1);
+//    delay(3000);
+//
+//    device.set_axis(0.5, 0.8);
+//    delay(3000);
+//
+//    device.set_axis(0, 0);
+
+//    int channel_PWM_L1 = 3;
+//    int channel_PWM_L2 = 4;
+//    ledcSetup(channel_PWM_L1, 1024, 10); // 设置舵机通道
+//    ledcAttachPin(2, channel_PWM_L1);  //将 LEDC 通道绑定到指定 IO 口上以实现输出
+//
+//    ledcSetup(channel_PWM_L2, 1024, 10); // 设置舵机通道
+//    ledcAttachPin(14, channel_PWM_L2);  //将 LEDC 通道绑定到指定 IO 口上以实现输出
+
+
+//    for (int i = 0; i < 1025; ++i) {
+//        ledcWrite(3, i);
+//        ledcWrite(4, 0);
+//        delay(10);
+//    }
+//
+//    for (int i = 0; i < 1025; ++i) {
+//        ledcWrite(4, i);
+//        ledcWrite(3, 0);
+//        delay(10);
+//    }
+
+//    wheel left(15,13,1);
+//    left.set_throttle(0.2);
+//    delay(3000);
+//    left.set_throttle(-0.5);
+//    delay(3000);
+//    left.set_throttle(0);
 
     static camera_config_t camera_config = {
             .pin_pwdn       = PWDN_GPIO_NUM,
