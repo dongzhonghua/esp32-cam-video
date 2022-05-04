@@ -10,8 +10,8 @@ two_wheels::two_wheels() : left_wheel(2, 14, 0), right_wheel(15, 13, 1) {
 }
 
 void two_wheels::set_axis(float x, float y) {
-    float left = x + y;
-    float right = y - x;
+    float right = (x + y)/2;
+    float left = (y - x)/2;
 
     if (std::abs(left) < 0.1f) {
         left = 0.0f;

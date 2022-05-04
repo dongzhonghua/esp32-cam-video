@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="favicon.ico"/>
+    <meta charset="utf-8"/>
+    <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <title>rpi-robot control</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .fit {
+            /* width: 100%; */
+            max-width: 100%;
+            max-height: 100vh;
+            display: block;
+        }
+    </style>
+</head>
+<body id="container">
+<script src="js/nipplejs.min.js"></script>
+<script src="js/jquery-3.6.0.min.js"></script>
+
+<script language="javascript">
+    // document.write(
+    //   '<img class="fit" src="//' +
+    //     window.location.hostname +
+    //     ':8080/?action=stream" class="img-responsive" />'
+    // );
+
+    // Use virtual joystick to control robot movement.
+    var joystick = nipplejs.create({
+        zone: document.getElementById("container"),
+        color: "blue",
+        threshold: 0.5,
+        size: 600,
+    });
+
+    var startPos = null;
+    joystick.on("start", function (evt, data) {
+        startPos = data.position;
+    });
+
+    var message = {}
+    joystick.on("move", function (evt, data) {
+        if (startPos == null) return;
+        console.log(data)
+        var x = (((data.position.x - startPos.x) / joystick.options.size) * 2).toFixed(1);
+        var y = (((data.position.y - startPos.y) / joystick.options.size) * 2).toFixed(1);
+
+        if (x === message["x"] && y === message["y"]) {
+            console.log("没变化，返回")
+            return;
+        }
+        message["x"] = x;
+        message["y"] = y;
+
+        $.get(
+            "http://192.168.31.218/axis",
+            message,
+            function (data) {
+                console.log("返回的数据是：" + data);
+            });
+    });
+
+    joystick.on("end", function (evt, data) {
+        if (startPos == null) return;
+        var message = {}
+        message["x"] = 0;
+        message["y"] = 0;
+        $.get(
+            "http://192.168.31.218/axis",
+            message,
+            function (data) {
+                console.log("返回的数据是：" + data);
+            });
+        message = {}
+    });
+</script>
+</body>
+</html>
