@@ -32,21 +32,6 @@
 #if CONFIG_OV2640_SUPPORT
 #include "ov2640.h"
 #endif
-#if CONFIG_OV7725_SUPPORT
-#include "ov7725.h"
-#endif
-#if CONFIG_OV3660_SUPPORT
-#include "ov3660.h"
-#endif
-#if CONFIG_OV5640_SUPPORT
-#include "ov5640.h"
-#endif
-#if CONFIG_NT99141_SUPPORT
-#include "nt99141.h"
-#endif
-#if CONFIG_OV7670_SUPPORT
-#include "ov7670.h"
-#endif
 
 
 #if defined(ARDUINO_ARCH_ESP32) && defined(CONFIG_ARDUHAL_ESP_LOG)
@@ -174,36 +159,6 @@ static esp_err_t camera_probe(const camera_config_t *config, camera_model_t *out
         case OV2640_PID:
             *out_camera_model = CAMERA_OV2640;
             ov2640_init(&s_state->sensor);
-            break;
-#endif
-#if CONFIG_OV7725_SUPPORT
-        case OV7725_PID:
-            *out_camera_model = CAMERA_OV7725;
-            ov7725_init(&s_state->sensor);
-            break;
-#endif
-#if CONFIG_OV3660_SUPPORT
-        case OV3660_PID:
-            *out_camera_model = CAMERA_OV3660;
-            ov3660_init(&s_state->sensor);
-            break;
-#endif
-#if CONFIG_OV5640_SUPPORT
-        case OV5640_PID:
-            *out_camera_model = CAMERA_OV5640;
-            ov5640_init(&s_state->sensor);
-            break;
-#endif
-#if CONFIG_OV7670_SUPPORT
-        case OV7670_PID:
-            *out_camera_model = CAMERA_OV7670;
-            ov7670_init(&s_state->sensor);
-            break;
-#endif
-#if CONFIG_NT99141_SUPPORT
-        case NT99141_PID:
-            *out_camera_model = CAMERA_NT99141;
-            NT99141_init(&s_state->sensor);
             break;
 #endif
         default:

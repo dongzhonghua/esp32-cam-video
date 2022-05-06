@@ -3,7 +3,27 @@
 
 void Network::init(String ssid, String password)
 {
-    Serial.println("scan start");
+//    Serial.println("scan start");
+//    scan_network();
+    Serial.println("");
+    Serial.print("Connecting: ");
+    Serial.print(ssid.c_str());
+    Serial.print(" @");
+    Serial.println(password.c_str());
+
+    WiFi.begin(ssid.c_str(), password.c_str());
+    while (WiFiClass::status() != WL_CONNECTED)
+    {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+}
+
+void Network::scan_network() {
     int n = WiFi.scanNetworks();
     Serial.println("scan done");
     if (n == 0)
@@ -26,22 +46,6 @@ void Network::init(String ssid, String password)
             delay(10);
         }
     }
-    Serial.println("");
-    Serial.print("Connecting: ");
-    Serial.print(ssid.c_str());
-    Serial.print(" @");
-    Serial.println(password.c_str());
-
-    WiFi.begin(ssid.c_str(), password.c_str());
-    while (WiFiClass::status() != WL_CONNECTED)
-    {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
 }
 
 unsigned int Network::getBilibiliFans(String uid)
@@ -57,7 +61,7 @@ unsigned int Network::getBilibiliFans(String uid)
     // httpCode will be negative on error
     if (httpCode > 0)
     {
-        // file found at server
+        // file found at webServer
         if (httpCode == HTTP_CODE_OK)
         {
             String payload = http.getString();

@@ -2,19 +2,30 @@
 // Created by zhonghua dong on 2022/5/4.
 //
 
+
+
 #ifndef ESP32_CAM_VIDEO_CONTROLLER_H
 #define ESP32_CAM_VIDEO_CONTROLLER_H
-#include <WebServer.h>
-#include <WiFiClient.h>
+
+#include "WebServer.h"
 #include "two_wheels.h"
+
+extern WebServer webServer;
 
 class controller {
 public:
-    inline static WebServer *server =  new WebServer(80);
-    inline static two_wheels *device = new two_wheels();
+    static two_wheels device;
+
     static void handleAxis();
+
     static void handleNotFound();
+
     static void handleFavicon();
+
+    static void handleJPGSstream();
+
+    static void handleJPG();
+
     static void init();
 
 };

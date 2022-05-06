@@ -14,9 +14,10 @@ class Network
 private:
 
 public:
-    void init(String ssid, String password);
-    unsigned int getBilibiliFans(String url);
+    static void init(String ssid, String password);
+    static unsigned int getBilibiliFans(String url);
 
+    static void scan_network() ;
 };
 
 #endif

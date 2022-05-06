@@ -22,13 +22,10 @@ def read_from_mjpg_stream():
 
 
 if __name__ == "__main__":
-    out = cv2.VideoWriter("video.mp4", cv2.VideoWriter_fourcc(*"mp4v"), 12, (1280, 720))  # 写入视频
     for frame in read_from_mjpg_stream():
-        out.write(frame)  # 写入帧
         cv2.imshow("video stream", frame)
         if cv2.waitKey(1) == 27:
             exit(0)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # q退出
             break
-    out.release()
     cv2.destroyAllWindows()
