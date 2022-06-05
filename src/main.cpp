@@ -35,6 +35,7 @@
 #include "camera_pins.h"
 #include "network.h"
 
+#define CAM_ROTATION 90
 Network network;
 
 // ==== SETUP method ==================================================================
@@ -76,8 +77,8 @@ void setup() {
             .ledc_timer     = LEDC_TIMER_0,
             .ledc_channel   = LEDC_CHANNEL_0,
             .pixel_format   = PIXFORMAT_JPEG,
-            .frame_size     = FRAMESIZE_XGA,
-            .jpeg_quality   = 16,
+            .frame_size     = FRAMESIZE_SVGA, // 太大了明显会变卡
+            .jpeg_quality   = 8, // 16的话质量就非常好了
             .fb_count       = 2
     };
 
