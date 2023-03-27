@@ -10,9 +10,9 @@ def update_throttle(throttle, cur_pos):
     response = requests.get(url, params={"x": 0, "y": -0})
     print(throttle, response.text)
     if throttle > 0:
-        return cur_pos + 1
+        return cur_pos + 20
     else:
-        return cur_pos - 1
+        return cur_pos - 20
 
 
 if __name__ == '__main__':
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # 用于设置时间参数
     start_time = time.time()
     last_time = start_time
-    cur_pos = -10
+    cur_pos = -100
     # 用于输出结果可视化
     setpoint, y, x = [], [], []
     # 设置系统运行时间
@@ -38,9 +38,6 @@ if __name__ == '__main__':
         x += [current_time - start_time]
         y += [cur_pos]
         setpoint += [pid.setpoint]
-        # 用于变量temp赋初值
-        if current_time - start_time > 0:
-            pid.setpoint = 0
 
         last_time = current_time
 
